@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>Ejemplo Cargar Regiones</title>
+        <meta charset="UTF-8">
+
+        <script src="js/jquery-2.2.4.min.js"  type="text/javascript"></script>
+
+
+        <script type="text/javascript">
+
+            $(function () {
+
+                $("#cargaRegBtn").click(function () {
+                    traerRegiones();
+                });
+
+                $("#regSelect").change(function () {
+                    var codRegion = $("select[id=regSelect]").val();
+                    traerComunas(codRegion);
+                });
+
+                var select = document.getElementById('regSelect');
+                select.addEventListener('change',
+                        function () {
+                            var selectedOption = this.options[select.selectedIndex];
+                            document.getElementById('tituloTabla').innerHTML = "Coomunas de : "+selectedOption.label;
+                        });
+            });
+
+
+
+            function traerRegiones() {
+
+                $.ajax({
+                    type: "post"
+                    , url: "Control1"
+                    , data: {instruccion: "cargarLasRegiones", region: 0}
+                    , async: true
+                    , cache: false
+                    , success: function (resp) {
+
+                        $("#regSelect").empty();
+                        var option = document.createElement("option");
+                        option.setAttribute("value", 0);
+                        option.setAttribute("label", "Elija una Opción");
+                        $("#regSelect").append(option);
+
+                        $.each(resp, function (ind, obj) {
+
+                            option = document.createElement("option");
+                            option.setAttribute("value", obj.codigoRegion);
+                            option.setAttribute("label", obj.nombreRegion);
+
+
+                            $("#regSelect").append(option);
+                        });
+
+                    }
+                    , error: function (jqXHR, estado, error) {
+
+                        alert("error " + error);
+                    }
+
+                });
+            }
+            ;
+
+            function traerComunas(codReg) {
+                console.log("Entro a traerComunas()!!");
+                $("#tablaComunas > tbody").empty();
+
+                $.ajax({
+                    type: "post"
+                    , url: "Control1"
+                    , data: {instruccion: "cargarLasComunas", region: codReg}
+                    , async: true
+                    , cache: false
+                    , success: function (resp) {
+
+                        $.each(resp, function (ind, obj) {
+                            $("#tablaComunas > tbody").append('<tr><td>' + obj.codigoCom + '</td><td>' + obj.nombreCom + '</td></tr>');
+                        });
+
+                    }
+                    , error: function (jqXHR, estado, error) {
+
+                        alert("error " + error);
+                    }
+
+                });
+            }
+            ;
+
+        </script>
+    </head>
+
+
+    <body>
+
+        <h1>Ejemplo Carga Regiones y Comunas</h1>
+
+        <form id="cargaRegForm" name="cargarRegiones" action="" method="POST" >
+            Regiones:
+            <select id="regSelect" name="regSelect" >
+                <option value="0" label="sin datos"></option>            
+            </select>
+            <button id="cargaRegBtn" type="button" style=" height: 30px; background-color:  lightblue"  >
+                Cargar Regiones
+            </button>
+        </form>
+
+        <br>
+        <br>
+
+        <table id="tablaComunas" border="1" >
+            <thead>                       
+                <tr>
+                    <th id="tituloTabla" colspan="2" style=" background-color:  lightgrey" >Comunas</th>
+                </tr>
+                <tr>
+                    <th >código Comuna</th>
+                    <th>Nombre Comuna</th>
+                </tr>
+
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                </tr>
+
+            </tbody>
+        </table>
+
+
+    </body>
+</html>
+
